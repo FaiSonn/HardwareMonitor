@@ -1,6 +1,10 @@
-﻿public class MemoryInfo
+﻿namespace HardwareMonitor.Models
 {
-    public double TotalMemoryGB { get; set; }
-    public double FreeMemoryGB { get; set; }
-    public double UsagePercentage { get; set; }
+    public class MemoryInfo
+    {
+        public double TotalMemoryGB { get; set; }
+        public double FreeMemoryGB { get; set; }
+        public double UsedMemoryGB { get; set; }
+        public double UsagePercentage { get; set; }
+    }
 }

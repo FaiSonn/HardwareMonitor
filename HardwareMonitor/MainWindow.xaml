@@ -1,12 +1,125 @@
 ﻿<Window x:Class="HardwareMonitor.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:HardwareMonitor"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
+        xmlns:vm="clr-namespace:HardwareMonitor.ViewModels"
+        Title="Hardware Monitor"
+        Height="650"
+        Width="1000"
+        Background="#1E1E1E"
+        Foreground="White">
+
+    <Window.DataContext>
+        <vm:MainViewModel/>
+    </Window.DataContext>
+
+    <Grid Margin="15">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <!-- Верхняя панель -->
+        <Border Background="#2D2D30"
+                Padding="10"
+                CornerRadius="8"
+                Margin="0,0,0,10">
+
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Center">
+
+                <Button Content="Обновить"
+                        Width="120"
+                        Margin="10"
+                        Background="#007ACC"
+                        Foreground="White"
+                        Command="{Binding RefreshCommand}"/>
+
+                <Button Content="Экспорт"
+                        Width="120"
+                        Margin="10"
+                        Background="#28A745"
+                        Foreground="White"
+                        Command="{Binding ExportCommand}"/>
+
+                <Button Content="?"
+                        Width="50"
+                        Margin="10"
+                        Background="#FF9800"
+                        Foreground="White"
+                        Click="Help_Click"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Вкладки -->
+        <TabControl Grid.Row="1"
+                    Background="#252526">
+
+            <!-- CPU -->
+            <TabItem Header="CPU">
+                <StackPanel Margin="15">
+                    <TextBlock Text="{Binding CpuInfo.Name}"
+                               FontSize="18"
+                               FontWeight="Bold"/>
+                    <TextBlock Text="Загрузка:" Margin="0,10,0,5"/>
+                    <ProgressBar Value="{Binding CpuInfo.LoadPercentage}"
+                                 Maximum="100"
+                                 Height="25"/>
+                </StackPanel>
+            </TabItem>
+
+            <!-- Memory -->
+            <TabItem Header="Memory">
+                <StackPanel Margin="15">
+                    <TextBlock Text="Общая память (GB):"
+                               FontWeight="Bold"/>
+                    <TextBlock Text="{Binding MemoryInfo.TotalMemoryGB}"/>
+
+                    <TextBlock Text="Используется (GB):"
+                               Margin="0,10,0,0"
+                               FontWeight="Bold"/>
+                    <TextBlock Text="{Binding MemoryInfo.UsedMemoryGB}"/>
+
+                    <TextBlock Text="Свободно (GB):"
+                               Margin="0,10,0,0"
+                               FontWeight="Bold"/>
+                    <TextBlock Text="{Binding MemoryInfo.FreeMemoryGB}"/>
+
+                    <TextBlock Text="Загрузка:"
+                               Margin="0,10,0,5"/>
+                    <ProgressBar Value="{Binding MemoryInfo.UsagePercentage}"
+                                 Maximum="100"
+                                 Height="25"/>
+                </StackPanel>
+            </TabItem>
+
+            <!-- Disks -->
+            <TabItem Header="Disks">
+                <DataGrid ItemsSource="{Binding Disks}"
+                          Background="#1E1E1E"
+                          Foreground="White"
+                          AutoGenerateColumns="True"/>
+            </TabItem>
+
+            <!-- GPU -->
+            <TabItem Header="GPU">
+                <StackPanel Margin="15">
+                    <TextBlock Text="{Binding GpuInfo.Name}"
+                               FontSize="16"
+                               FontWeight="Bold"/>
+                    <TextBlock Text="{Binding GpuInfo.VideoMemoryGB}"/>
+                    <TextBlock Text="{Binding GpuInfo.Resolution}"/>
+                </StackPanel>
+            </TabItem>
+
+            <!-- Network -->
+            <TabItem Header="Network">
+                <DataGrid ItemsSource="{Binding NetworkAdapters}"
+                          Background="#1E1E1E"
+                          Foreground="White"
+                          AutoGenerateColumns="True"/>
+            </TabItem>
+
+        </TabControl>
     </Grid>
 </Window>
