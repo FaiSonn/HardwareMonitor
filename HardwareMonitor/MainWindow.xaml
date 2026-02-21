@@ -3,16 +3,80 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:HardwareMonitor.ViewModels"
         Title="Hardware Monitor"
-        Height="650"
-        Width="1000"
-        Background="#1E1E1E"
-        Foreground="White">
+        Height="720"
+        Width="1100"
+        Background="#F5F7FA"
+        WindowStartupLocation="CenterScreen">
 
     <Window.DataContext>
         <vm:MainViewModel/>
     </Window.DataContext>
 
-    <Grid Margin="15">
+    <Window.Resources>
+
+        <!-- Карточка -->
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="20"/>
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="15"
+                                      ShadowDepth="2"
+                                      Opacity="0.15"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Заголовок -->
+        <Style x:Key="TitleText" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,0,15"/>
+        </Style>
+
+        <!-- Кнопки -->
+        <Style TargetType="Button">
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Padding" Value="15,5"/>
+            <Setter Property="Margin" Value="8"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#0078D7"/>
+            <Setter Property="BorderThickness" Value="0"/>
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="8"
+                        Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border"
+                                Property="Background"
+                                Value="#005A9E"/>
+                            </Trigger>
+
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border"
+                                Property="Background"
+                                Value="#004578"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="20">
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -20,106 +84,131 @@
         </Grid.RowDefinitions>
 
         <!-- Верхняя панель -->
-        <Border Background="#2D2D30"
-                Padding="10"
-                CornerRadius="8"
-                Margin="0,0,0,10">
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    Margin="0,0,0,20">
 
-            <StackPanel Orientation="Horizontal"
-                        HorizontalAlignment="Center">
+            <Button Content="Обновить"
+                    Command="{Binding RefreshCommand}"/>
 
-                <Button Content="Обновить"
-                        Width="120"
-                        Margin="10"
-                        Background="#007ACC"
-                        Foreground="White"
-                        Command="{Binding RefreshCommand}"/>
+            <Button Content="Экспорт"
+                    Background="#2E8B57"
+                    Command="{Binding ExportCommand}"/>
 
-                <Button Content="Экспорт"
-                        Width="120"
-                        Margin="10"
-                        Background="#28A745"
-                        Foreground="White"
-                        Command="{Binding ExportCommand}"/>
-
-                <Button Content="?"
-                        Width="50"
-                        Margin="10"
-                        Background="#FF9800"
-                        Foreground="White"
-                        Click="Help_Click"/>
-            </StackPanel>
-        </Border>
+            <Button Content="?"
+                    Width="45"
+                    Background="#FF9800"
+                    Click="Help_Click"/>
+        </StackPanel>
 
         <!-- Вкладки -->
         <TabControl Grid.Row="1"
-                    Background="#252526">
+                    FontSize="14">
 
             <!-- CPU -->
-            <TabItem Header="CPU">
-                <StackPanel Margin="15">
-                    <TextBlock Text="{Binding CpuInfo.Name}"
-                               FontSize="18"
-                               FontWeight="Bold"/>
-                    <TextBlock Text="Загрузка:" Margin="0,10,0,5"/>
-                    <ProgressBar Value="{Binding CpuInfo.LoadPercentage}"
-                                 Maximum="100"
-                                 Height="25"/>
-                </StackPanel>
+            <TabItem Header="Процессор">
+                <ScrollViewer>
+                    <StackPanel>
+
+                        <Border Style="{StaticResource CardStyle}">
+                            <StackPanel>
+                                <TextBlock Text="Информация о процессоре"
+                                           Style="{StaticResource TitleText}"/>
+
+                                <TextBlock Text="{Binding CpuInfo.Name}"/>
+
+                                <TextBlock Text="Загрузка:"
+                                           Margin="0,15,0,5"/>
+
+                                <ProgressBar Value="{Binding CpuInfo.LoadPercentage}"
+                                             Maximum="100"
+                                             Height="22"
+                                             Foreground="#0078D7"/>
+                            </StackPanel>
+                        </Border>
+
+                    </StackPanel>
+                </ScrollViewer>
             </TabItem>
 
-            <!-- Memory -->
-            <TabItem Header="Memory">
-                <StackPanel Margin="15">
-                    <TextBlock Text="Общая память (GB):"
-                               FontWeight="Bold"/>
-                    <TextBlock Text="{Binding MemoryInfo.TotalMemoryGB}"/>
+            <!-- MEMORY -->
+            <TabItem Header="Оперативная память">
+                <ScrollViewer>
+                    <StackPanel>
 
-                    <TextBlock Text="Используется (GB):"
-                               Margin="0,10,0,0"
-                               FontWeight="Bold"/>
-                    <TextBlock Text="{Binding MemoryInfo.UsedMemoryGB}"/>
+                        <Border Style="{StaticResource CardStyle}">
+                            <StackPanel>
 
-                    <TextBlock Text="Свободно (GB):"
-                               Margin="0,10,0,0"
-                               FontWeight="Bold"/>
-                    <TextBlock Text="{Binding MemoryInfo.FreeMemoryGB}"/>
+                                <TextBlock Text="Память (GB)"
+                                           Style="{StaticResource TitleText}"/>
 
-                    <TextBlock Text="Загрузка:"
-                               Margin="0,10,0,5"/>
-                    <ProgressBar Value="{Binding MemoryInfo.UsagePercentage}"
-                                 Maximum="100"
-                                 Height="25"/>
-                </StackPanel>
+                                <TextBlock Text="Общая:"/>
+                                <TextBlock Text="{Binding MemoryInfo.TotalMemoryGB}"/>
+
+                                <TextBlock Text="Используется:"
+                                           Margin="0,10,0,0"/>
+                                <TextBlock Text="{Binding MemoryInfo.UsedMemoryGB}"/>
+
+                                <TextBlock Text="Свободно:"
+                                           Margin="0,10,0,0"/>
+                                <TextBlock Text="{Binding MemoryInfo.FreeMemoryGB}"/>
+
+                                <TextBlock Text="Загрузка:"
+                                           Margin="0,15,0,5"/>
+
+                                <ProgressBar Value="{Binding MemoryInfo.UsagePercentage}"
+                                             Maximum="100"
+                                             Height="22"
+                                             Foreground="#E81123"/>
+                            </StackPanel>
+                        </Border>
+
+                    </StackPanel>
+                </ScrollViewer>
             </TabItem>
 
-            <!-- Disks -->
-            <TabItem Header="Disks">
-                <DataGrid ItemsSource="{Binding Disks}"
-                          Background="#1E1E1E"
-                          Foreground="White"
-                          AutoGenerateColumns="True"/>
+            <!-- DISKS -->
+            <TabItem Header="Диски">
+                <Border Style="{StaticResource CardStyle}">
+                    <DataGrid ItemsSource="{Binding Disks}"
+                              AutoGenerateColumns="True"
+                              IsReadOnly="True"
+                              GridLinesVisibility="None"
+                              HeadersVisibility="Column"
+                              RowBackground="White"
+                              AlternatingRowBackground="#F3F6FA"/>
+                </Border>
             </TabItem>
 
             <!-- GPU -->
-            <TabItem Header="GPU">
-                <StackPanel Margin="15">
-                    <TextBlock Text="{Binding GpuInfo.Name}"
-                               FontSize="16"
-                               FontWeight="Bold"/>
-                    <TextBlock Text="{Binding GpuInfo.VideoMemoryGB}"/>
-                    <TextBlock Text="{Binding GpuInfo.Resolution}"/>
-                </StackPanel>
+            <TabItem Header="Видеокарта">
+                <Border Style="{StaticResource CardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="GPU"
+                                   Style="{StaticResource TitleText}"/>
+                        <TextBlock Text="{Binding GpuInfo.Name}"/>
+                        <TextBlock Text="Видеопамять (GB):"/>
+                        <TextBlock Text="{Binding GpuInfo.VideoMemoryGB}"/>
+                        <TextBlock Text="Разрешение:"/>
+                        <TextBlock Text="{Binding GpuInfo.Resolution}"/>
+                    </StackPanel>
+                </Border>
             </TabItem>
 
-            <!-- Network -->
-            <TabItem Header="Network">
-                <DataGrid ItemsSource="{Binding NetworkAdapters}"
-                          Background="#1E1E1E"
-                          Foreground="White"
-                          AutoGenerateColumns="True"/>
+            <!-- NETWORK -->
+            <TabItem Header="Сеть">
+                <Border Style="{StaticResource CardStyle}">
+                    <DataGrid ItemsSource="{Binding NetworkAdapters}"
+                              AutoGenerateColumns="True"
+                              IsReadOnly="True"
+                              GridLinesVisibility="None"
+                              HeadersVisibility="Column"
+                              RowBackground="White"
+                              AlternatingRowBackground="#F3F6FA"/>
+                </Border>
             </TabItem>
 
         </TabControl>
+
     </Grid>
 </Window>
